@@ -1,4 +1,5 @@
 import Volunteer from '../models/Volunteer.js';
+import { sendVolunteerNotification } from '../services/email.service.js';
 
 const normalizeInterests = (interest) => {
   const values = Array.isArray(interest) ? interest : [interest];
@@ -43,9 +44,35 @@ export const registerVolunteer = async (req, res, next) => {
       status: 'new'
     });
 
-    res.status(201).json({ success: true, data: volunteer });
+    let emailNotification = { skipped: true };
+    try {
+      emailNotification = await sendVolunteerNotification(volunteer);
+    } catch (emailError) {
+      console.error('Volunteer email notification failed:', {
+        volunteerId: volunteer._id,
+        message: emailError.message
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: 'Volunteer registered successfully',
+      data: volunteer,
+      emailNotification
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Volunteer registration failed:', {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      body: {
+        hasName: Boolean(req.body?.name),
+        hasEmail: Boolean(req.body?.email),
+        hasPhone: Boolean(req.body?.phone),
+        hasInterest: Boolean(req.body?.interest)
+      }
+    });
+    next(error);
   }
 };
 

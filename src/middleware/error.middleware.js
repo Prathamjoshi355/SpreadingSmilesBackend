@@ -1,9 +1,15 @@
 export const errorHandler = (err, req, res, next) => {
   let error = { ...err };
   error.message = err.message;
+  error.statusCode = err.statusCode;
 
-  // Log to console for dev
-  console.error(err);
+  console.error('API error:', {
+    method: req.method,
+    path: req.originalUrl,
+    message: err.message,
+    name: err.name,
+    code: err.code
+  });
 
   // Mongoose bad ObjectId
   if (err.name === 'CastError') {
@@ -26,6 +32,10 @@ export const errorHandler = (err, req, res, next) => {
 
   res.status(error.statusCode || 500).json({
     success: false,
-    message: error.message || 'Server Error'
+    message: error.message || 'Server Error',
+    error: process.env.NODE_ENV === 'production' ? undefined : {
+      name: err.name,
+      code: err.code
+    }
   });
 };

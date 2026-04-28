@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { errorHandler } from './middleware/error.middleware.js';
+import { ensureDBConnection } from './middleware/db.middleware.js';
 
 // Load environment variables
 dotenv.config();
@@ -19,6 +20,8 @@ const app = express();
 
 // Middleware
 const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
   process.env.FRONTEND_URL,
   ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : [])
 ].filter(Boolean).map((origin) => origin.trim().replace(/\/+$/, ''));
@@ -72,6 +75,7 @@ app.get('/api/config', (req, res) => {
 });
 
 // API Routes
+app.use('/api', ensureDBConnection);
 app.use('/api/auth', authRoutes);
 app.use('/api/blog', blogRoutes);
 app.use('/api/activity', activityRoutes);
