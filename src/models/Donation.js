@@ -19,6 +19,11 @@ const donationSchema = new mongoose.Schema(
       type: String,
       default: 'INR'
     },
+    paymentMethod: {
+      type: String,
+      enum: ['razorpay', 'bank-transfer'],
+      default: 'bank-transfer'
+    },
     paymentId: {
       type: String
     },

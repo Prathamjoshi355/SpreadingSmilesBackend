@@ -50,6 +50,48 @@ export const createOrder = async (req, res, next) => {
   }
 };
 
+// @desc    Save bank transfer donation request
+// @route   POST /api/donate/bank-transfer
+// @access  Public
+export const createBankTransferDonation = async (req, res, next) => {
+  try {
+    const { name, email, amount, message, isAnonymous } = req.body;
+
+    if (!name || !email || !amount) {
+      return res.status(400).json({ success: false, message: 'Please provide name, email, and amount' });
+    }
+
+    const donation = await Donation.create({
+      name: isAnonymous ? 'Anonymous' : name,
+      email: isAnonymous ? 'anonymous@ngo.com' : email,
+      amount,
+      currency: 'INR',
+      paymentMethod: 'bank-transfer',
+      status: 'pending',
+      message: message || '',
+      isAnonymous: isAnonymous || false
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Donation request saved. Please complete the transfer using these bank details and admin will approve once received.',
+      data: {
+        donationId: donation._id,
+        bankInfo: {
+          accountName: 'Spreading Smiles NGO',
+          accountNumber: '1234567890',
+          ifsc: 'ICIC0001234',
+          bank: 'ICICI Bank',
+          branch: 'Indore',
+          upi: 'spreadingsmiles@icici'
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Verify payment and save donation
 // @route   POST /api/donate/verify-payment
 // @access  Public
@@ -76,6 +118,7 @@ export const verifyPayment = async (req, res, next) => {
       name: isAnonymous ? 'Anonymous' : name,
       email: isAnonymous ? 'anonymous@ngo.com' : email,
       amount,
+      paymentMethod: 'razorpay',
       paymentId: razorpay_payment_id,
       orderId: razorpay_order_id,
       status: 'completed',
@@ -93,12 +136,44 @@ export const verifyPayment = async (req, res, next) => {
   }
 };
 
+// @desc    Create manual donation (Admin only)
+// @route   POST /api/donate/manual
+// @access  Private/Admin
+export const createManualDonation = async (req, res, next) => {
+  try {
+    const { name, email, amount, message, paymentMethod, status, isAnonymous } = req.body;
+
+    if (!name || !email || !amount) {
+      return res.status(400).json({ success: false, message: 'Please provide name, email, and amount' });
+    }
+
+    const donation = await Donation.create({
+      name: isAnonymous ? 'Anonymous' : name,
+      email: isAnonymous ? 'anonymous@ngo.com' : email,
+      amount,
+      currency: 'INR',
+      paymentMethod: paymentMethod || 'bank-transfer',
+      status: status || 'completed',
+      message: message || '',
+      isAnonymous: isAnonymous || false
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Donation added successfully.',
+      data: donation
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get all donations (Admin only)
 // @route   GET /api/donations
 // @access  Private/Admin
 export const getAllDonations = async (req, res, next) => {
   try {
-    const donations = await Donation.find({ status: 'completed' }).sort({ createdAt: -1 });
+    const donations = await Donation.find().sort({ createdAt: -1 });
 
     const totalAmount = donations.reduce((sum, donation) => sum + donation.amount, 0);
 

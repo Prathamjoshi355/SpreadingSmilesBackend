@@ -13,6 +13,7 @@ import blogRoutes from './routes/blog.routes.js';
 import activityRoutes from './routes/activity.routes.js';
 import galleryRoutes from './routes/gallery.routes.js';
 import donationRoutes from './routes/donation.routes.js';
+import impactRoutes from './routes/impact.routes.js';
 import volunteerRoutes from './routes/volunteer.routes.js';
 import analyticsRoutes from './routes/analytics.routes.js';
 
@@ -81,6 +82,7 @@ app.use('/api/blog', blogRoutes);
 app.use('/api/activity', activityRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/donate', donationRoutes);
+app.use('/api/impact-stats', impactRoutes);
 app.use('/api/volunteer', volunteerRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
