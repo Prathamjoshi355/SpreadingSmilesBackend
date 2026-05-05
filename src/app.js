@@ -23,6 +23,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://spreadingsmiles-9a9wnwips-prathamjoshi355s-projects.vercel.app',
   process.env.FRONTEND_URL,
   ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : [])
 ].filter(Boolean).map((origin) => origin.trim().replace(/\/+$/, ''));
@@ -39,7 +40,25 @@ app.use(cors({
     }
 
     return callback(new Error(`CORS blocked for origin: ${origin}`));
-  }
+  },
+  credentials: true
+}));
+
+// Handle OPTIONS requests for all routes
+app.options('*', cors({
+  origin(origin, callback) {
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    const normalizedOrigin = origin.replace(/\/+$/, '');
+    if (allowedOrigins.includes(normalizedOrigin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true
 }));
 
 app.use(express.json({ limit: '50mb' }));
