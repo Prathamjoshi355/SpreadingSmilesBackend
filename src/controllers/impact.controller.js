@@ -1,10 +1,10 @@
 import ImpactStat from '../models/ImpactStat.js';
 
 const fallbackStats = [
-  { key: 'raised', icon: 'TrendingUp', value: 'Rs 76,000+', label: 'Raised for medical support' },
-  { key: 'activities', icon: 'Activity', value: '300+', label: 'Social activities conducted' },
-  { key: 'campaigns', icon: 'Megaphone', value: '15+', label: 'Awareness campaigns executed' },
-  { key: 'volunteers', icon: 'Users', value: '100+', label: 'Active volunteers across Indore' }
+  { key: 'raised', icon: 'TrendingUp', value: 'Loading...', label: 'Raised for medical support' },
+  { key: 'activities', icon: 'Activity', value: 'Loading...', label: 'Social activities conducted' },
+  { key: 'campaigns', icon: 'Megaphone', value: 'Loading...', label: 'Awareness campaigns executed' },
+  { key: 'volunteers', icon: 'Users', value: 'Loading...', label: 'Active volunteers across Indore' }
 ];
 
 export const getImpactStats = async (req, res, next) => {
