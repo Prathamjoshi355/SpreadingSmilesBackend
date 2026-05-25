@@ -1,16 +1,43 @@
 import Blog from '../models/Blog.js';
 
+const blogDomains = new Set([
+  'healthcare',
+  'animal-welfare',
+  'education',
+  'awareness',
+  'elderly-care',
+  'environment',
+  'child-welfare'
+]);
+
+const parseDomains = (input) => {
+  let values = input;
+
+  if (typeof values === 'string') {
+    try {
+      values = JSON.parse(values);
+    } catch {
+      values = [values];
+    }
+  }
+
+  if (!Array.isArray(values)) return [];
+
+  return [...new Set(values.map((value) => String(value).trim()).filter((value) => blogDomains.has(value)))];
+};
+
 // @desc    Create blog
 // @route   POST /api/blog
 // @access  Private/Admin
 export const createBlog = async (req, res, next) => {
   try {
     const { title, content, excerpt, author } = req.body;
+    const domains = parseDomains(req.body.domains);
 
     // Get image from Multer
     const coverImage = req.file ? req.file.path : null;
 
-    if (!title || !content || !coverImage) {
+    if (!title || !content || !coverImage || domains.length === 0) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
     }
 
@@ -19,7 +46,8 @@ export const createBlog = async (req, res, next) => {
       content,
       coverImage,
       excerpt,
-      author: author || 'NGO'
+      author: author || 'NGO',
+      domains
     });
 
     res.status(201).json({ success: true, data: blog });
@@ -33,7 +61,10 @@ export const createBlog = async (req, res, next) => {
 // @access  Public
 export const getAllBlogs = async (req, res, next) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const domain = typeof req.query.domain === 'string' && blogDomains.has(req.query.domain)
+      ? req.query.domain
+      : null;
+    const blogs = await Blog.find(domain ? { domains: domain } : {}).sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, count: blogs.length, data: blogs });
   } catch (error) {
@@ -64,6 +95,7 @@ export const getBlogBySlug = async (req, res, next) => {
 export const updateBlog = async (req, res, next) => {
   try {
     const { title, content, excerpt, author } = req.body;
+    const domains = parseDomains(req.body.domains);
 
     let blog = await Blog.findById(req.params.id);
 
@@ -72,12 +104,19 @@ export const updateBlog = async (req, res, next) => {
     }
 
     // Update with new image if provided
-    const updateData = {
-      title,
-      content,
-      excerpt,
-      author
-    };
+    const updateData = {};
+
+    if (title) updateData.title = title;
+    if (content) updateData.content = content;
+    if (typeof excerpt === 'string') updateData.excerpt = excerpt;
+    if (author) updateData.author = author;
+
+    if (Object.hasOwn(req.body, 'domains')) {
+      if (domains.length === 0) {
+        return res.status(400).json({ success: false, message: 'Please select at least one blog domain' });
+      }
+      updateData.domains = domains;
+    }
 
     if (req.file) {
       updateData.coverImage = req.file.path;

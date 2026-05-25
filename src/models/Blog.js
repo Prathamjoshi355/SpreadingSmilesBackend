@@ -28,7 +28,11 @@ const blogSchema = new mongoose.Schema(
     author: {
       type: String,
       default: 'NGO'
-    }
+    },
+    domains: [{
+      type: String,
+      enum: ['healthcare', 'animal-welfare', 'education', 'awareness', 'elderly-care', 'environment', 'child-welfare']
+    }]
   },
   { timestamps: true }
 );
