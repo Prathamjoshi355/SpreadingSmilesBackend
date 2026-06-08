@@ -32,6 +32,16 @@ const galleryStorage = new CloudinaryStorage({
   }
 });
 
+// Storage for Volunteer photos
+const volunteerStorage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'spreading_smiling/volunteers',
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+    resource_type: 'auto'
+  }
+});
+
 // Storage for Activities
 const activityStorage = new CloudinaryStorage({
   cloudinary: cloudinary,
@@ -45,4 +55,5 @@ const activityStorage = new CloudinaryStorage({
 // Multer instances for different folders
 export const uploadBlog = multer({ storage: blogStorage });
 export const uploadGallery = multer({ storage: galleryStorage });
+export const uploadVolunteer = multer({ storage: volunteerStorage });
 export const uploadActivity = multer({ storage: activityStorage });

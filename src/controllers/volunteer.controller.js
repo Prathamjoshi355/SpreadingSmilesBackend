@@ -89,6 +89,24 @@ export const getAllVolunteers = async (req, res, next) => {
   }
 };
 
+// @desc    Get approved volunteers with photos for public slider
+// @route   GET /api/volunteer/featured
+// @access  Public
+export const getFeaturedVolunteers = async (req, res, next) => {
+  try {
+    const volunteers = await Volunteer.find({
+      status: 'active',
+      photoUrl: { $exists: true, $ne: '' }
+    })
+      .select('name photoUrl')
+      .sort({ updatedAt: -1 });
+
+    res.status(200).json({ success: true, count: volunteers.length, data: volunteers });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get volunteer statistics
 // @route   GET /api/volunteer/stats
 // @access  Private/Admin
@@ -116,7 +134,12 @@ export const getVolunteerStats = async (req, res, next) => {
 // @access  Private/Admin
 export const updateVolunteer = async (req, res, next) => {
   try {
-    const volunteer = await Volunteer.findByIdAndUpdate(req.params.id, req.body, {
+    const updateData = { ...req.body };
+    if (req.file) {
+      updateData.photoUrl = req.file.path;
+    }
+
+    const volunteer = await Volunteer.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true
     });

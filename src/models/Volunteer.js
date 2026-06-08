@@ -31,7 +31,8 @@ const volunteerSchema = new mongoose.Schema(
       type: String,
       enum: ['new', 'contacted', 'active', 'inactive'],
       default: 'new'
-    }
+    },
+    photoUrl: String
   },
   { timestamps: true }
 );

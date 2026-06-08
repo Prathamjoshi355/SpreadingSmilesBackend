@@ -78,12 +78,11 @@ export const createBankTransferDonation = async (req, res, next) => {
       data: {
         donationId: donation._id,
         bankInfo: {
-          accountName: 'Spreading Smiles NGO',
-          accountNumber: '1234567890',
-          ifsc: 'ICIC0001234',
-          bank: 'ICICI Bank',
-          branch: 'Indore',
-          upi: 'spreadingsmiles@icici'
+          accountName: 'Spreading Smiles Welfare Society',
+          accountNumber: ' 101 8757 0879',
+          ifsc: ' IDFB 0041 269',
+          bank: 'IDFC Bank',
+          branch: 'Vijay Nagar, Indore',
         }
       }
     });
