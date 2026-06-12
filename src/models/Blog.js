@@ -32,7 +32,11 @@ const blogSchema = new mongoose.Schema(
     domains: [{
       type: String,
       enum: ['healthcare', 'animal-welfare', 'education', 'awareness', 'elderly-care', 'environment', 'child-welfare']
-    }]
+    }],
+    date: {
+      type: Date,
+      default: Date.now
+    }
   },
   { timestamps: true }
 );

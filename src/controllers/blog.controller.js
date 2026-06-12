@@ -31,7 +31,7 @@ const parseDomains = (input) => {
 // @access  Private/Admin
 export const createBlog = async (req, res, next) => {
   try {
-    const { title, content, excerpt, author } = req.body;
+    const { title, content, excerpt, author, date } = req.body;
     const domains = parseDomains(req.body.domains);
 
     // Get image from Multer
@@ -47,7 +47,8 @@ export const createBlog = async (req, res, next) => {
       coverImage,
       excerpt,
       author: author || 'NGO',
-      domains
+      domains,
+      date: date ? new Date(date) : Date.now()
     });
 
     res.status(201).json({ success: true, data: blog });
@@ -64,7 +65,7 @@ export const getAllBlogs = async (req, res, next) => {
     const domain = typeof req.query.domain === 'string' && blogDomains.has(req.query.domain)
       ? req.query.domain
       : null;
-    const blogs = await Blog.find(domain ? { domains: domain } : {}).sort({ createdAt: -1 });
+    const blogs = await Blog.find(domain ? { domains: domain } : {}).sort({ date: -1, createdAt: -1 });
 
     res.status(200).json({ success: true, count: blogs.length, data: blogs });
   } catch (error) {
@@ -94,7 +95,7 @@ export const getBlogBySlug = async (req, res, next) => {
 // @access  Private/Admin
 export const updateBlog = async (req, res, next) => {
   try {
-    const { title, content, excerpt, author } = req.body;
+    const { title, content, excerpt, author, date } = req.body;
     const domains = parseDomains(req.body.domains);
 
     let blog = await Blog.findById(req.params.id);
@@ -110,6 +111,7 @@ export const updateBlog = async (req, res, next) => {
     if (content) updateData.content = content;
     if (typeof excerpt === 'string') updateData.excerpt = excerpt;
     if (author) updateData.author = author;
+    if (date) updateData.date = new Date(date);
 
     if (Object.hasOwn(req.body, 'domains')) {
       if (domains.length === 0) {
