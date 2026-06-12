@@ -15,6 +15,10 @@ const gallerySchema = new mongoose.Schema(
       type: String,
       enum: ['event', 'team', 'activity', 'impact', 'hero', 'other'],
       default: 'other'
+    },
+    visible: {
+      type: Boolean,
+      default: true
     }
   },
   { timestamps: true }
