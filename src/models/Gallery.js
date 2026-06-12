@@ -13,7 +13,7 @@ const gallerySchema = new mongoose.Schema(
     description: String,
     category: {
       type: String,
-      enum: ['event', 'team', 'activity', 'impact', 'other'],
+      enum: ['event', 'team', 'activity', 'impact', 'hero', 'other'],
       default: 'other'
     }
   },
