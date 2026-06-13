@@ -36,9 +36,14 @@ export const createBlog = async (req, res, next) => {
 
     // Get image from Multer
     const coverImage = req.file ? req.file.path : null;
+    const publishedDate = date ? new Date(date) : new Date();
 
     if (!title || !content || !coverImage || domains.length === 0) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
+    }
+
+    if (date && isNaN(publishedDate.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid publish date' });
     }
 
     const blog = await Blog.create({
@@ -47,8 +52,8 @@ export const createBlog = async (req, res, next) => {
       coverImage,
       excerpt,
       author: author || 'NGO',
-      domains,
-      date: date ? new Date(date) : Date.now()
+      date: publishedDate,
+      domains
     });
 
     res.status(201).json({ success: true, data: blog });
@@ -90,6 +95,20 @@ export const getBlogBySlug = async (req, res, next) => {
   }
 };
 
+export const getBlogById = async (req, res, next) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+
+    if (!blog) {
+      return res.status(404).json({ success: false, message: 'Blog not found' });
+    }
+
+    res.status(200).json({ success: true, data: blog });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Update blog
 // @route   PUT /api/blog/:id
 // @access  Private/Admin
@@ -111,13 +130,25 @@ export const updateBlog = async (req, res, next) => {
     if (content) updateData.content = content;
     if (typeof excerpt === 'string') updateData.excerpt = excerpt;
     if (author) updateData.author = author;
-    if (date) updateData.date = new Date(date);
 
     if (Object.hasOwn(req.body, 'domains')) {
       if (domains.length === 0) {
         return res.status(400).json({ success: false, message: 'Please select at least one blog domain' });
       }
       updateData.domains = domains;
+    }
+
+    if (Object.hasOwn(req.body, 'date')) {
+      if (!date) {
+        return res.status(400).json({ success: false, message: 'Please provide a valid publish date' });
+      }
+
+      const publishedDate = new Date(date);
+      if (isNaN(publishedDate.getTime())) {
+        return res.status(400).json({ success: false, message: 'Invalid publish date' });
+      }
+
+      updateData.date = publishedDate;
     }
 
     if (req.file) {

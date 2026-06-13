@@ -14,9 +14,7 @@ router.get('/', getAllImages);
 router.get('/category/:category', getImagesByCategory);
 
 // Admin routes
-router.get('/admin', protect, adminOnly, getAllImagesAdmin);
 router.post('/', protect, adminOnly, uploadGallery.single('image'), uploadImage);
-router.put('/:id', protect, adminOnly, updateImage);
 router.delete('/:id', protect, adminOnly, deleteImage);
 
 export default router;

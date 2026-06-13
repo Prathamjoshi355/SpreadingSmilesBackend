@@ -3,6 +3,7 @@ import {
   createBlog,
   getAllBlogs,
   getBlogBySlug,
+  getBlogById,
   updateBlog,
   deleteBlog
 } from '../controllers/blog.controller.js';
@@ -12,6 +13,7 @@ import { uploadBlog } from '../config/multer.js';
 const router = express.Router();
 
 router.get('/', getAllBlogs);
+router.get('/id/:id', getBlogById);
 router.get('/:slug', getBlogBySlug);
 
 // Admin routes

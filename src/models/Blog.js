@@ -29,14 +29,14 @@ const blogSchema = new mongoose.Schema(
       type: String,
       default: 'NGO'
     },
-    domains: [{
-      type: String,
-      enum: ['healthcare', 'animal-welfare', 'education', 'awareness', 'elderly-care', 'environment', 'child-welfare']
-    }],
     date: {
       type: Date,
       default: Date.now
-    }
+    },
+    domains: [{
+      type: String,
+      enum: ['healthcare', 'animal-welfare', 'education', 'awareness', 'elderly-care', 'environment', 'child-welfare']
+    }]
   },
   { timestamps: true }
 );
