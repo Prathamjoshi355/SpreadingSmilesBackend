@@ -4,6 +4,7 @@ import {
   getAllImages,
   getImagesByCategory,
   getImagesByActivity,
+  updateImage,
   deleteImage
 } from '../controllers/gallery.controller.js';
 import { protect, adminOnly } from '../middleware/auth.middleware.js';
@@ -16,7 +17,8 @@ router.get('/category/:category', getImagesByCategory);
 router.get('/activity/:activityId', getImagesByActivity);
 
 // Admin routes
-router.post('/', protect, adminOnly, uploadGallery.array('images', 10), uploadImage);
+router.post('/', protect, adminOnly, uploadGallery.any(), uploadImage);
+router.put('/:id', protect, adminOnly, uploadGallery.single('image'), updateImage);
 router.delete('/:id', protect, adminOnly, deleteImage);
 
 export default router;

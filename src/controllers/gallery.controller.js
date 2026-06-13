@@ -85,6 +85,36 @@ export const getImagesByCategory = async (req, res, next) => {
   }
 };
 
+// @desc    Update gallery image metadata
+// @route   PUT /api/gallery/:id
+// @access  Private/Admin
+export const updateImage = async (req, res, next) => {
+  try {
+    const { title, description, category, date, activityId } = req.body;
+    const image = await Gallery.findById(req.params.id);
+
+    if (!image) {
+      return res.status(404).json({ success: false, message: 'Image not found' });
+    }
+
+    if (req.file) {
+      image.imageUrl = req.file.path;
+    }
+
+    if (title !== undefined) image.title = title;
+    if (description !== undefined) image.description = description;
+    if (category !== undefined) image.category = category;
+    if (date !== undefined && date !== '') image.date = new Date(date);
+    if (activityId !== undefined) image.activity = activityId || undefined;
+
+    await image.save();
+
+    res.status(200).json({ success: true, data: image });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Delete image from gallery
 // @route   DELETE /api/gallery/:id
 // @access  Private/Admin
