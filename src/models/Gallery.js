@@ -15,6 +15,11 @@ const gallerySchema = new mongoose.Schema(
       type: String,
       enum: ['event', 'team', 'activity', 'impact', 'hero', 'other'],
       default: 'other'
+    },
+    date: Date,
+    activity: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Activity'
     }
   },
   { timestamps: true }

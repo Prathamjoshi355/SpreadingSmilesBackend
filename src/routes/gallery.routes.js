@@ -3,6 +3,7 @@ import {
   uploadImage,
   getAllImages,
   getImagesByCategory,
+  getImagesByActivity,
   deleteImage
 } from '../controllers/gallery.controller.js';
 import { protect, adminOnly } from '../middleware/auth.middleware.js';
@@ -12,9 +13,10 @@ const router = express.Router();
 
 router.get('/', getAllImages);
 router.get('/category/:category', getImagesByCategory);
+router.get('/activity/:activityId', getImagesByActivity);
 
 // Admin routes
-router.post('/', protect, adminOnly, uploadGallery.single('image'), uploadImage);
+router.post('/', protect, adminOnly, uploadGallery.array('images', 10), uploadImage);
 router.delete('/:id', protect, adminOnly, deleteImage);
 
 export default router;

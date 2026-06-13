@@ -1,4 +1,18 @@
 import Activity from '../models/Activity.js';
+import Gallery from '../models/Gallery.js';
+
+const createGalleryForActivity = async (activityId, imageUrls, date) => {
+  return Promise.all(
+    imageUrls.map((imageUrl) =>
+      Gallery.create({
+        imageUrl,
+        category: 'activity',
+        activity: activityId,
+        date: date ? new Date(date) : undefined
+      })
+    )
+  );
+};
 
 // @desc    Create activity
 // @route   POST /api/activity
@@ -8,7 +22,7 @@ export const createActivity = async (req, res, next) => {
     const { title, description, category, date, location, volunteers } = req.body;
 
     // Get images from Multer
-    const images = req.files ? req.files.map(file => file.path) : [];
+    const images = req.files ? req.files.map((file) => file.path) : [];
 
     if (!title || !description || !date) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
@@ -23,6 +37,10 @@ export const createActivity = async (req, res, next) => {
       location,
       volunteers: volunteers || 0
     });
+
+    if (images.length > 0) {
+      await createGalleryForActivity(activity._id, images, date);
+    }
 
     res.status(201).json({ success: true, data: activity });
   } catch (error) {
@@ -75,13 +93,18 @@ export const updateActivity = async (req, res, next) => {
     const updateData = { ...req.body };
 
     if (req.files && req.files.length > 0) {
-      updateData.images = req.files.map(file => file.path);
+      updateData.images = req.files.map((file) => file.path);
     }
 
     activity = await Activity.findByIdAndUpdate(req.params.id, updateData, {
       new: true,
       runValidators: true
     });
+
+    if (req.files && req.files.length > 0) {
+      const galleryDate = updateData.date ? new Date(updateData.date) : activity.date;
+      await createGalleryForActivity(activity._id, updateData.images, galleryDate);
+    }
 
     res.status(200).json({ success: true, data: activity });
   } catch (error) {
