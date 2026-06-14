@@ -1,7 +1,7 @@
 import TickerItem from '../models/TickerItem.js';
 
 const defaultItems = [
-  { text: 'Helpline: +91 98765 43210' },
+  { text: 'Helpline: +91 72239 98881' },
   { text: 'spreadsingsmiles@gmail.com' },
   { text: 'Indore, Madhya Pradesh' }
 ];
