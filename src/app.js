@@ -25,6 +25,7 @@ const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
+  'https://spreadingsmiles.vercel.app',
   'https://spreadingsmiles-9a9wnwips-prathamjoshi355s-projects.vercel.app',
   process.env.FRONTEND_URL,
   ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : [])
